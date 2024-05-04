@@ -2,12 +2,12 @@ import * as THREE from 'three';
 import woodAsset from './assets/wood2.jpg';
 
 export class GameBoard {
-    readonly group: THREE.Group;
+    readonly object: THREE.Object3D;
 
     private readonly SquareSize = 1;
 
     constructor(width: number, height: number) {
-        this.group = new THREE.Group();
+        this.object = new THREE.Group();
 
         for (let i = 0; i < height; i++) {
             for (let j = 0; j < width; j++) {
@@ -23,7 +23,7 @@ export class GameBoard {
                     j * this.SquareSize + this.SquareSize * 0.5
                 );
                 square.rotateX(-Math.PI / 2);
-                this.group.add(square);
+                this.object.add(square);
             }
         }
 
@@ -36,6 +36,6 @@ export class GameBoard {
         const board = new THREE.Mesh(boxGeometry, new THREE.MeshStandardMaterial({ map: texture }));
         board.rotateX(-Math.PI / 2);
         board.position.set((this.SquareSize * height) / 2, -0.35 - 0.01, (this.SquareSize * width) / 2);
-        this.group.add(board);
+        this.object.add(board);
     }
 }

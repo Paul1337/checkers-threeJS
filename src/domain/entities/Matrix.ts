@@ -28,7 +28,6 @@ export class Matrix {
                 this.field[this.field.length - 1 - i][(i % 2) + j * 2] = PointType.Black;
             }
         }
-        console.log(this.field);
     }
 
     set(point: Point, pointType: PointType) {

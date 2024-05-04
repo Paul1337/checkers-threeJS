@@ -1,5 +1,6 @@
+import { GameLogic } from '../boundaries/GameLogic';
 import { tryMoveChecker } from '../usecases/tryMoveChecker';
-import { Matrix } from './Matrix';
+import { FieldType, Matrix } from './Matrix';
 import { Player } from './Player';
 import { Point } from './Point';
 
@@ -11,10 +12,6 @@ export enum currentPlayer {
 export interface GameConfig {
     MatrixWidth: number;
     MatrixHeight: number;
-}
-
-export interface GameLogic {
-    makeMove(from: Point, to: Point): void;
 }
 
 export class Game implements GameLogic {
@@ -40,5 +37,9 @@ export class Game implements GameLogic {
 
     makeMove(from: Point, to: Point): void {
         tryMoveChecker(this.matrix, from, to);
+    }
+
+    get field(): FieldType {
+        return this.matrix.field;
     }
 }
