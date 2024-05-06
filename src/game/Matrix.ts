@@ -1,3 +1,4 @@
+import { MatrixBoundary } from '../boundaries/MatrixBoundary';
 import { Point } from './Point';
 
 export enum PointType {
@@ -8,7 +9,7 @@ export enum PointType {
 
 export type FieldType = Array<Array<PointType>>;
 
-export class Matrix {
+export class Matrix implements MatrixBoundary {
     field: FieldType;
 
     constructor(width: number, height: number) {

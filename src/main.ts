@@ -1,13 +1,5 @@
-import { initGame } from './domain/usecases/initGame';
-import { Presenter } from './presenter/Presenter';
+import { Game } from './game/Game';
+import './styles/style.css';
 
-const game = initGame();
-game.start();
-
-const presenter = new Presenter(game);
-
-const update = () => {
-    presenter.update();
-    requestAnimationFrame(update);
-};
-update();
+const cofig = {};
+const game = new Game(config);

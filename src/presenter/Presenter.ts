@@ -1,12 +1,12 @@
 import { GameLogic } from '../domain/boundaries/GameLogic';
-import { PointType } from '../domain/entities/Matrix';
-import { Figure, FigureType } from './Figure';
-import { GameBoard } from './GameBoard';
+import { PointType } from '../game/Matrix';
+import { Figure, FigureType } from '../game/Figure';
+import { GameBoard } from '../game/GameBoard';
 import { presenterConfig } from './presenterConfig';
-import { World } from './World';
+import { World } from '../game/World';
 
 import './styles/style.css';
-import { DragPresenter } from './DragPresenter';
+import { DragPresenter } from '../game/DragControl';
 
 export class Presenter {
     private world: World;
@@ -26,7 +26,10 @@ export class Presenter {
     }
 
     createBoard() {
-        const board = new GameBoard(this.game.field.length, this.game.field[0].length);
+        const board = new GameBoard({
+            height: this.game.field.length,
+            width: this.game.field[0].length,
+        });
         this.world.scene.add(board.object);
         return board;
     }

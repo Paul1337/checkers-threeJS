@@ -1,12 +1,18 @@
 import * as THREE from 'three';
 import woodAsset from './assets/wood2.jpg';
+import { MatrixBoundary } from '../domain/boundaries/MatrixBoundary';
+
+export interface GameBoardConfig {
+    width: number;
+    height: number;
+}
 
 export class GameBoard {
     readonly object: THREE.Object3D;
 
     private readonly SquareSize = 1;
 
-    constructor(width: number, height: number) {
+    constructor({ width, height }: GameBoardConfig, private matrix: MatrixBoundary) {
         this.object = new THREE.Group();
 
         for (let i = 0; i < height; i++) {
@@ -37,5 +43,28 @@ export class GameBoard {
         board.rotateX(-Math.PI / 2);
         board.position.set((this.SquareSize * height) / 2, -0.35 - 0.01, (this.SquareSize * width) / 2);
         this.object.add(board);
+
+        this.listenToEvents();
+    }
+
+    listenToEvents() {
+        document.addEventListener('mousemove', this.handleMouseMove.bind(this));
+    }
+
+    handleMouseMove(event: MouseEvent) {
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(pointer, camera);
+        const intersects = raycaster.intersectObjects(scene.children, false);
+        if (intersects.length > 0) {
+            if (INTERSECTED != intersects[0].object) {
+                if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+                INTERSECTED = intersects[0].object;
+                INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+                INTERSECTED.material.emissive.setHex(0xff0000);
+            }
+        } else {
+            if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+            INTERSECTED = null;
+        }
     }
 }

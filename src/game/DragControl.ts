@@ -2,7 +2,7 @@ import { DragControls } from 'three/examples/jsm/Addons.js';
 import * as THREE from 'three';
 import { World } from './World';
 
-export class DragPresenter {
+export class DragControl {
     private dragControls: DragControls;
     private selectedFigure?: THREE.Object3D;
 

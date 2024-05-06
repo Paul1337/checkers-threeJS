@@ -1,4 +1,4 @@
-import { Game, GameConfig } from '../entities/Game';
+import { Game, GameConfig } from '../game/Game';
 
 const gameConfig: GameConfig = {
     MatrixHeight: 8,

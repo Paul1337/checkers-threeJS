@@ -1,5 +1,5 @@
-import { Matrix, PointType } from '../entities/Matrix';
-import { Point } from '../entities/Point';
+import { Matrix, PointType } from '../game/Matrix';
+import { Point } from '../game/Point';
 
 export const tryMoveChecker = (matrix: Matrix, from: Point, to: Point) => {
     if (matrix.get(from) === PointType.Empty) {
