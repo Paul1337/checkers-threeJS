@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import woodAsset from './assets/wood2.jpg';
-import { MatrixBoundary } from '../domain/boundaries/MatrixBoundary';
+import woodAsset from '../assets/wood2.jpg';
+import { world } from './World';
 
 export interface GameBoardConfig {
     width: number;
@@ -9,11 +9,18 @@ export interface GameBoardConfig {
 
 export class GameBoard {
     readonly object: THREE.Object3D;
+    private squares: THREE.Object3D[];
 
     private readonly SquareSize = 1;
 
-    constructor({ width, height }: GameBoardConfig, private matrix: MatrixBoundary) {
+    private pointer: THREE.Vector2;
+    private INTERSECTED: THREE.Object3D | null = null;
+
+    constructor({ width, height }: GameBoardConfig) {
         this.object = new THREE.Group();
+
+        this.squares = [];
+        this.pointer = new THREE.Vector2();
 
         for (let i = 0; i < height; i++) {
             for (let j = 0; j < width; j++) {
@@ -29,6 +36,7 @@ export class GameBoard {
                     j * this.SquareSize + this.SquareSize * 0.5
                 );
                 square.rotateX(-Math.PI / 2);
+                this.squares.push(square);
                 this.object.add(square);
             }
         }
@@ -43,28 +51,25 @@ export class GameBoard {
         board.rotateX(-Math.PI / 2);
         board.position.set((this.SquareSize * height) / 2, -0.35 - 0.01, (this.SquareSize * width) / 2);
         this.object.add(board);
-
-        this.listenToEvents();
-    }
-
-    listenToEvents() {
-        document.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        world.scene.add(this.object);
     }
 
     handleMouseMove(event: MouseEvent) {
         const raycaster = new THREE.Raycaster();
-        raycaster.setFromCamera(pointer, camera);
-        const intersects = raycaster.intersectObjects(scene.children, false);
+        raycaster.setFromCamera(this.pointer, world.camera);
+        const intersects = raycaster.intersectObjects(this.squares, false);
         if (intersects.length > 0) {
-            if (INTERSECTED != intersects[0].object) {
-                if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-                INTERSECTED = intersects[0].object;
-                INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-                INTERSECTED.material.emissive.setHex(0xff0000);
+            // intersects[0].object.
+            if (this.INTERSECTED != intersects[0].object) {
+                // if (this.INTERSECTED)
+                //     this.INTERSECTED. .setHex(this.INTERSECTED.currentHex);
+                this.INTERSECTED = intersects[0].object;
+                // this.INTERSECTED.currentHex = this.INTERSECTED.material.emissive.getHex();
+                // this.INTERSECTED.material.emissive.setHex(0xff0000);
             }
         } else {
-            if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-            INTERSECTED = null;
+            if (this.INTERSECTED) this.INTERSECTED.material.emissive.setHex(this.INTERSECTED.currentHex);
+            this.INTERSECTED = null;
         }
     }
 }

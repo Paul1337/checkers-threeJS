@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { DragControls, OrbitControls } from 'three/examples/jsm/Addons.js';
 
-export class World {
+class World {
     container: HTMLDivElement;
     camera: THREE.PerspectiveCamera;
     scene: THREE.Scene;
@@ -53,3 +53,5 @@ export class World {
         this.renderer.render(this.scene, this.camera);
     }
 }
+
+export const world = new World();
