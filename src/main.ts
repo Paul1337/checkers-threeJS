@@ -1,9 +1,4 @@
-import { Game, GameConfig } from './game/Game';
-import './styles/style.css';
+import { modulesController } from './modulesController';
 
-const config: GameConfig = {
-    MatrixHeight: 8,
-    MatrixWidth: 8,
-};
-const game = new Game(config);
-game.update();
+modulesController.createWorldModule();
+modulesController.createGameModule();
