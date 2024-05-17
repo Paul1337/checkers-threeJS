@@ -7,6 +7,7 @@ import { Table } from './Table.presenter';
 import { GameService } from '../../../../../shared/game/domain/Game.service';
 import { Point } from '../../../../../shared/game/domain/entities/Point.entity';
 import { ClientGameService } from '../../domain/ClientGame.service';
+import { PointType } from '@shared/game/domain/entities/Matrix.entity';
 
 type PlaneMeshType = THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardMaterial>;
 
@@ -75,6 +76,13 @@ export class GameBoard {
     }
 
     listenToEvents() {
+        this.gameService.events.onGameStart.push(() => {
+            if (this.gameService.me.pointType === PointType.White) {
+                this.worldPresenter.camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+                this.worldPresenter.orbitControls.update();
+            }
+        });
+
         document.addEventListener('mousemove', this.handleMouseMove.bind(this));
         document.addEventListener('click', this.handleMouseDown.bind(this));
     }

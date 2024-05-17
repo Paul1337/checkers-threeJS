@@ -31,7 +31,7 @@ export class UI {
     }
 
     handleEvents() {
-        this.gameService.events.onGameStart = () => {
+        this.gameService.events.onGameStart.push(() => {
             document.getElementById('my-color').textContent =
                 this.gameService.me.pointType === PointType.White
                     ? 'Мой цвет - белый'
@@ -40,7 +40,7 @@ export class UI {
             document.getElementById('turn-info').textContent = this.gameService.myTurn
                 ? 'Мой ход'
                 : 'Ход противника';
-        };
+        });
 
         this.gameService.events.onTurnUpdate = myTurn => {
             document.getElementById('turn-info').textContent = myTurn ? 'Мой ход' : 'Ход противника';
