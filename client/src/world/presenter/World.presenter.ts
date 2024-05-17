@@ -47,9 +47,20 @@ export class WorldPresenter {
         this.orbitControls.update();
 
         this.container.appendChild(this.renderer.domElement);
+
+        this.handleEvents();
     }
 
     update() {
         this.renderer.render(this.scene, this.camera);
+    }
+
+    handleEvents() {
+        window.onresize = () => {
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        };
     }
 }

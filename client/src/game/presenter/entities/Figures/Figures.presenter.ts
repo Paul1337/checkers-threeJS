@@ -61,9 +61,17 @@ export class FiguresPresenter {
     makeViewMove(fromPosition: Point, gameMove: GameMove) {
         const figure = this.figures.find(figure => figure.gamePosition.equals(fromPosition));
         if (!figure) return;
-        figure.animateTo(gameMove.path[gameMove.path.length - 1], () => {
-            figure.moveTo(gameMove.path[gameMove.path.length - 1]);
-        });
+
+        if (gameMove.capturedPoints.length > 0) {
+            figure.animateToCapturing(gameMove.path[gameMove.path.length - 1], () => {
+                figure.moveTo(gameMove.path[gameMove.path.length - 1]);
+            });
+        } else {
+            figure.animateToLinear(gameMove.path[gameMove.path.length - 1], () => {
+                figure.moveTo(gameMove.path[gameMove.path.length - 1]);
+            });
+        }
+
         gameMove.capturedPoints.forEach(capturedPoint => {
             const figure = this.figures.find(figure => figure.gamePosition.equals(capturedPoint));
             if (figure) {
@@ -81,9 +89,11 @@ export class FiguresPresenter {
     handleMouseDown(event: MouseEvent) {
         if (this.hoveredFigure) {
             this.selectedFigure?.unselect();
+            this.selectedFigure?.unlift();
 
             if (this.hoveredFigure !== this.selectedFigure) {
                 this.hoveredFigure.select();
+                this.hoveredFigure.lift();
                 this.selectedFigure = this.hoveredFigure;
             } else {
                 this.selectedFigure = null;

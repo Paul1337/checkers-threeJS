@@ -2,9 +2,12 @@ import * as THREE from 'three';
 import { presenterConfig } from '../../Presenter.config';
 // import { PointType } from '../../../domain/entities/Matrix.entity';
 // import { Point } from '../../../domain/entities/Point.entity';
-import { Animation } from '../Animation.presenter';
+import { Animation } from '../Animation/Animation.presenter';
 import { PointType } from '../../../../../../shared/game/domain/entities/Matrix.entity';
 import { Point } from '../../../../../../shared/game/domain/entities/Point.entity';
+import { LinearAnimation } from '../Animation/LinearAnimation.presenter';
+import { FigureConverter } from './Figure.converter';
+import { CapturingAnimation } from '../Animation/CapturingAnimation.presenter';
 
 export interface FigureConfig {
     radius: number;
@@ -33,24 +36,18 @@ export class Figure {
             new THREE.MeshStandardMaterial({
                 metalness: 0.4,
                 roughness: 0.2,
-                color: type === PointType.Black ? 0x303030 : 0xffffff,
+                color: type === PointType.Black ? 0x303030 : 0xdbd197, //0xc7c7c7,
             })
         );
         this.pointType = type;
 
-        const position = new THREE.Vector3(
-            0.5 + gamePosition.x * presenterConfig.figure.radius * 2,
-            presenterConfig.figure.height / 2,
-            0.5 + gamePosition.y * presenterConfig.figure.radius * 2
-        );
-
-        figure.position.set(position.x, position.y, position.z);
+        figure.position.copy(FigureConverter.convertToPresenterPosition(gamePosition));
         figure.castShadow = true;
         figure.receiveShadow = true;
 
-        this.liftedPosition = position.clone();
+        this.liftedPosition = figure.position.clone();
         this.liftedPosition.setY(this.liftedPosition.y + 0.2);
-        this.defaultPosition = position.clone();
+        this.defaultPosition = figure.position.clone();
         this.defaultColor = figure.material.emissive.clone();
 
         this.object = figure;
@@ -58,22 +55,30 @@ export class Figure {
     }
 
     select() {
-        this.movingAnimation = new Animation(this.object.position.clone(), this.liftedPosition.clone());
-
-        // this.object.position.set(this.liftedPosition.x, this.liftedPosition.y, this.liftedPosition.z);
         this.object.material.emissive.set(0x32a852);
 
         this.isSelected = true;
     }
 
+    lift() {
+        this.movingAnimation = new LinearAnimation(
+            this.object.position.clone(),
+            this.liftedPosition.clone(),
+            presenterConfig.animation.liftFigureTime
+        );
+    }
+
     unselect() {
-        this.movingAnimation = new Animation(this.object.position.clone(), this.defaultPosition.clone());
-
-        // this.object.position.set(this.defaultPosition.x, this.defaultPosition.y, this.defaultPosition.z);
-
         this.object.material.emissive.set(this.defaultColor);
-
         this.isSelected = false;
+    }
+
+    unlift() {
+        this.movingAnimation = new LinearAnimation(
+            this.object.position.clone(),
+            this.defaultPosition.clone(),
+            presenterConfig.animation.liftFigureTime
+        );
     }
 
     hover() {
@@ -90,14 +95,29 @@ export class Figure {
         this.object.material.emissive.set(this.defaultColor);
     }
 
-    animateTo(position: Point, onDone: () => void) {
-        const resultPosition = new THREE.Vector3(
-            0.5 + position.x * presenterConfig.figure.radius * 2,
-            this.defaultPosition.y,
-            0.5 + position.y * presenterConfig.figure.radius * 2
+    animateToLinear(position: Point, onDone: () => void) {
+        const resultPosition = FigureConverter.convertToPresenterPosition(position);
+        this.movingAnimation = new LinearAnimation(
+            this.object.position.clone(),
+            resultPosition,
+            presenterConfig.animation.linearMoveTime,
+            onDone
         );
-        this.movingAnimation = new Animation(this.object.position.clone(), resultPosition, onDone);
     }
+
+    animateToCapturing(position: Point, onDone: () => void) {
+        const resultPosition = FigureConverter.convertToPresenterPosition(position);
+        this.movingAnimation = new CapturingAnimation(
+            this.object.position.clone(),
+            resultPosition,
+            presenterConfig.animation.captureMoveTime,
+            onDone
+        );
+    }
+
+    // animate(animation: Animation) {
+    //     this.movingAnimation = animation;
+    // }
 
     moveTo(position: Point) {
         this.gamePosition = position;

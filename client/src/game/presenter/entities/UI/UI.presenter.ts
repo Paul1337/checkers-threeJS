@@ -15,17 +15,17 @@ export class UI {
         info.classList.add('info');
         this.container.appendChild(info);
 
-        const turnInfo = document.createElement('p');
-        turnInfo.classList.add('info__turn');
-        turnInfo.id = 'turn-info';
-        info.appendChild(turnInfo);
-        turnInfo.textContent = '';
-
         const myColor = document.createElement('p');
         myColor.classList.add('info__color');
         myColor.id = 'my-color';
         info.appendChild(myColor);
         myColor.textContent = '';
+
+        const turnInfo = document.createElement('p');
+        turnInfo.classList.add('info__turn');
+        turnInfo.id = 'turn-info';
+        info.appendChild(turnInfo);
+        turnInfo.textContent = '';
 
         this.handleEvents();
     }

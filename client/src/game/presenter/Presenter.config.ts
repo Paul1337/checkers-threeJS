@@ -10,6 +10,8 @@ export const presenterConfig = {
         height: 0.35,
     },
     animation: {
-        time: 15,
+        liftFigureTime: 15,
+        linearMoveTime: 25,
+        captureMoveTime: 50,
     },
 };

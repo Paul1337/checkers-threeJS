@@ -19,12 +19,6 @@ export class EventsPresenter {
 
             this.gameService.makeMove(from, move);
             this.figuresPresenter.makeViewMove(from, move);
-
-            // this.makeViewMove(from, move);
-            // const figure = this.figures.find(figure => figure.gamePosition.equals(from));
-            // if (figure) {
-            //     figure.animateTo(Point.from(move.path[move.path.length - 1]));
-            // }
         });
     }
 }

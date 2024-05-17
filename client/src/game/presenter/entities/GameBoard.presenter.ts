@@ -87,7 +87,6 @@ export class GameBoard {
         document.addEventListener('click', this.handleMouseDown.bind(this));
     }
 
-    // private pointer: THREE.Vector2;
     private hoveredCell: PlaneMeshType | null = null;
     private selectedCell: PlaneMeshType | null = null;
 
