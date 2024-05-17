@@ -6,10 +6,10 @@ import {
     SubscribeMessage,
     WebSocketGateway,
 } from '@nestjs/websockets';
-import { GameService } from './game.service';
 import { Socket } from 'net';
 import { PointType } from '@shared/game/domain/entities/Matrix.entity';
 import { MoveDto } from '@shared/game/dto/MoveDto';
+import { GameService } from '@shared/game/domain/Game.service';
 
 @WebSocketGateway({
     cors: {
@@ -24,20 +24,25 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     handleConnection(client: Socket) {
-        // console.log('connect', client);
         if (this.connected.length < 2) {
             this.connected.push(client);
+        } else {
+            // this.connected = [client];
         }
         console.log('connected list', this.connected.length);
     }
 
     handleDisconnect(client: Socket) {
-        // console.log('disconnect', client);
         const disconnectedIndex = this.connected.indexOf(client);
         if (disconnectedIndex > -1) {
             this.connected.splice(disconnectedIndex, 1);
         }
         console.log('connected list', this.connected.length);
+    }
+
+    @SubscribeMessage('reset')
+    resetGame() {
+        this.gameService.resetGame();
     }
 
     @SubscribeMessage('init')

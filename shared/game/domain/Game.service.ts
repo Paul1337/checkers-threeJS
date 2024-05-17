@@ -1,18 +1,15 @@
-import { GameMove } from '../../../../shared/game/domain/entities/GameMove.entity';
-import { Matrix, PointType } from '../../../../shared/game/domain/entities/Matrix.entity';
-import { Player } from '../../../../shared/game/domain/entities/Player.entity';
-import { Point } from '../../../../shared/game/domain/entities/Point.entity';
-import { gameConfig } from '../../../../shared/game/domain/Game.config';
-import { pointTypesOpposite } from '../../../../shared/game/domain/lib/pointType';
-import { network } from '../../shared/api/network.api';
+import { GameMove } from './entities/GameMove.entity';
+import { Matrix, PointType } from './entities/Matrix.entity';
+import { Player } from './entities/Player.entity';
+import { Point } from './entities/Point.entity';
+import { gameConfig } from './Game.config';
+import { pointTypesOpposite } from './lib/pointType';
 
 export class GameService {
     matrix: Matrix;
-    private player1: Player;
-    private player2: Player;
-
-    private currentPlayer: Player;
-    me: Player;
+    protected player1: Player;
+    protected player2: Player;
+    protected currentPlayer: Player;
 
     constructor() {
         this.matrix = new Matrix(gameConfig.matrix.width, gameConfig.matrix.height);
@@ -21,9 +18,6 @@ export class GameService {
         this.player2 = new Player(PointType.Black);
 
         this.currentPlayer = this.player1;
-        this.me = this.currentPlayer;
-
-        this.start();
     }
 
     getAvailableDestinationsFrom(point: Point) {
@@ -97,15 +91,8 @@ export class GameService {
         }
     }
 
-    start() {
-        // call api and check the turn
-
-        network.emit('init', (playerPointType: PointType) => {
-            console.log('Inited as player', playerPointType);
-            this.currentPlayer = this.player1;
-            this.me = playerPointType === PointType.White ? this.player1 : this.player2;
-            this.matrix.reset();
-        });
+    resetGame() {
+        this.matrix.reset();
     }
 
     makeMove(from: Point, gameMove: GameMove) {
@@ -115,18 +102,6 @@ export class GameService {
         });
         this.currentPlayer.points += gameMove.capturedPoints.length;
         this.switchTurn();
-    }
-
-    makeMyMove(from: Point, gameMove: GameMove) {
-        this.makeMove(from, gameMove);
-        network.emit('move', {
-            from,
-            move: gameMove,
-        });
-    }
-
-    get myTurn() {
-        return this.currentPlayer === this.me;
     }
 
     switchTurn() {

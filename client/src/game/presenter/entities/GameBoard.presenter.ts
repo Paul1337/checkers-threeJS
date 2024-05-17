@@ -4,8 +4,9 @@ import { WorldPresenter } from '../../../world/presenter/World.presenter';
 import woodAsset from '../assets/wood2.jpg';
 import { presenterConfig } from '../Presenter.config';
 import { Table } from './Table.presenter';
-import { GameService } from '../../domain/Game.service';
+import { GameService } from '../../../../../shared/game/domain/Game.service';
 import { Point } from '../../../../../shared/game/domain/entities/Point.entity';
+import { ClientGameService } from '../../domain/ClientGame.service';
 
 type PlaneMeshType = THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardMaterial>;
 
@@ -15,7 +16,7 @@ export class GameBoard {
 
     private readonly worldPresenter: WorldPresenter;
 
-    constructor(private gameService: GameService) {
+    constructor(private gameService: ClientGameService) {
         const { width, height } = gameService.matrix;
         this.object = new THREE.Group();
 

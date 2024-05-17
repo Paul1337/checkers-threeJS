@@ -7,4 +7,7 @@ export default defineConfig({
             '@shared': path.join(__dirname, '../shared'),
         },
     },
+    preview: {
+        port: 8010,
+    },
 });

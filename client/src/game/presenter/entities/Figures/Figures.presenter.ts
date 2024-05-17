@@ -1,19 +1,18 @@
 import * as THREE from 'three';
-import { modulesController } from '../../../../modulesController';
-import { WorldPresenter } from '../../../../world/presenter/World.presenter';
-import { GameBoard } from '../GameBoard.presenter';
-import { Figure, FigureObjectType } from './Figure.presenter';
-import { GameService } from '../../../domain/Game.service';
+import { GameMove } from '../../../../../../shared/game/domain/entities/GameMove.entity';
 import { PointType } from '../../../../../../shared/game/domain/entities/Matrix.entity';
 import { Point } from '../../../../../../shared/game/domain/entities/Point.entity';
-import { GameMove } from '../../../../../../shared/game/domain/entities/GameMove.entity';
-import { MoveDto } from '../../../../../../shared/game/dto/MoveDto';
+import { modulesController } from '../../../../modulesController';
+import { WorldPresenter } from '../../../../world/presenter/World.presenter';
+import { ClientGameService } from '../../../domain/ClientGame.service';
+import { GameBoard } from '../GameBoard.presenter';
+import { Figure, FigureObjectType } from './Figure.presenter';
 
 export class FiguresPresenter {
     figures: Figure[] = [];
     private worldPresenter: WorldPresenter;
 
-    constructor(private gameService: GameService, private board: GameBoard) {
+    constructor(private gameService: ClientGameService, private board: GameBoard) {
         if (!modulesController.modules.world) {
             throw new Error('world is not defined in figures presenter');
         }

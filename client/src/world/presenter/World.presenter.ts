@@ -11,9 +11,7 @@ export class WorldPresenter {
     orbitControls: OrbitControls;
 
     constructor() {
-        this.container = document.createElement('div');
-        const appContainer = document.getElementById('container')!;
-        appContainer.appendChild(this.container);
+        this.container = document.getElementById('container') as HTMLDivElement;
 
         this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 500);
         this.camera.position.z = 25;

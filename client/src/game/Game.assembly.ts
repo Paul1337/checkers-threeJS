@@ -1,16 +1,19 @@
-import { GameService } from './domain/Game.service';
+import { GameService } from '../../../shared/game/domain/Game.service';
 import { modulesController } from '../modulesController';
 import { WorldPresenter } from '../world/presenter/World.presenter';
 import { FiguresPresenter } from './presenter/entities/Figures/Figures.presenter';
 import { GameBoard } from './presenter/entities/GameBoard.presenter';
 import { EventsPresenter } from './presenter/entities/Events.presenter';
+import { UI } from './presenter/entities/UI/UI.presenter';
+import { ClientGameService } from './domain/ClientGame.service';
 
 export class Game {
-    readonly gameService: GameService;
+    readonly gameService: ClientGameService;
     readonly worldPresenter: WorldPresenter;
 
     readonly figuresPresenter: FiguresPresenter;
     readonly eventsPresenter: EventsPresenter;
+    readonly uiPresenter: UI;
 
     readonly board: GameBoard;
 
@@ -21,12 +24,12 @@ export class Game {
 
         this.worldPresenter = modulesController.modules.world.worldPresenter;
 
-        this.gameService = new GameService();
+        this.gameService = new ClientGameService();
 
         this.board = new GameBoard(this.gameService);
         this.figuresPresenter = new FiguresPresenter(this.gameService, this.board);
-
         this.eventsPresenter = new EventsPresenter(this.gameService, this.figuresPresenter);
+        this.uiPresenter = new UI(this.gameService);
 
         // const dragControl = new DragControl(figuresPresenter.figures.map(figure => figure.object));
 

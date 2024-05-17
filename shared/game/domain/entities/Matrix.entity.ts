@@ -28,6 +28,8 @@ export class Matrix {
     }
 
     reset() {
+        this.field.forEach((row, i) => row.forEach((el, j) => (this.field[i][j] = PointType.Empty)));
+
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 4; j++) {
                 this.field[i][1 - (i % 2) + j * 2] = PointType.White;

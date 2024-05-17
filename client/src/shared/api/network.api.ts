@@ -4,7 +4,7 @@ export class Network {
     private readonly io: Socket;
 
     constructor() {
-        this.io = io('ws://localhost:8008');
+        this.io = io(import.meta.env.VITE_WS_SERVER_URL);
     }
 
     emit(ev: string, data: any) {

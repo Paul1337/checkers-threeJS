@@ -1,11 +1,12 @@
 import { Point } from '../../../../../shared/game/domain/entities/Point.entity';
 import { MoveDto } from '../../../../../shared/game/dto/MoveDto';
 import { network } from '../../../shared/api/network.api';
-import { GameService } from '../../domain/Game.service';
+import { GameService } from '../../../../../shared/game/domain/Game.service';
 import { FiguresPresenter } from './Figures/Figures.presenter';
+import { ClientGameService } from '../../domain/ClientGame.service';
 
 export class EventsPresenter {
-    constructor(private gameService: GameService, private figuresPresenter: FiguresPresenter) {
+    constructor(private gameService: ClientGameService, private figuresPresenter: FiguresPresenter) {
         this.handleEvents();
     }
 
