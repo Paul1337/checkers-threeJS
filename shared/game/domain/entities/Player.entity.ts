@@ -1,4 +1,4 @@
-import { PointType } from './Matrix.entity';
+import { PointType } from './Matrix/Matrix.entity';
 
 export class Player {
     points: number = 0;

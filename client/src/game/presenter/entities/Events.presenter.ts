@@ -16,8 +16,8 @@ export class EventsPresenter {
 
             from = Point.from(from);
             move.path = move.path.map(pathPoint => Point.from(pathPoint));
-
             this.gameService.makeMove(from, move);
+
             this.figuresPresenter.makeViewMove(from, move);
         });
     }

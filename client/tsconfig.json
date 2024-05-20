@@ -25,5 +25,5 @@
         }
         // "noImplicitAny": false
     },
-    "include": ["./src", "../shared/game/domain/Game.service.ts"]
+    "include": ["./src", "../shared"]
 }

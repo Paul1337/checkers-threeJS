@@ -7,7 +7,7 @@ import {
     WebSocketGateway,
 } from '@nestjs/websockets';
 import { Socket } from 'net';
-import { PointType } from '@shared/game/domain/entities/Matrix.entity';
+import { PointType } from '@shared/game/domain/entities/Matrix/Matrix.entity';
 import { MoveDto } from '@shared/game/dto/MoveDto';
 import { GameService } from '@shared/game/domain/Game.service';
 

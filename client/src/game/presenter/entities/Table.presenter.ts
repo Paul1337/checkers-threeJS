@@ -23,8 +23,8 @@ export class Table {
         this.loader.load('/models/table3.glb', gltf => {
             const box = new THREE.Box3().setFromObject(gltf.scene);
             const size = box.getSize(new THREE.Vector3());
-            console.log(size);
-            console.log(gltf);
+            // console.log(size);
+            // console.log(gltf);
             this.object = gltf.scene;
             gltf.scene.position.copy(position);
             gltf.scene.scale.copy(

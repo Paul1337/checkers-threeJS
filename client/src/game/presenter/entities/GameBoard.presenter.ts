@@ -1,13 +1,12 @@
+import { PointType } from '@shared/game/domain/entities/Matrix/Matrix.entity';
 import * as THREE from 'three';
+import { Point } from '@shared/game/domain/entities/Point.entity';
 import { modulesController } from '../../../modulesController';
 import { WorldPresenter } from '../../../world/presenter/World.presenter';
+import { ClientGameService } from '../../domain/ClientGame.service';
 import woodAsset from '../assets/wood2.jpg';
 import { presenterConfig } from '../Presenter.config';
 import { Table } from './Table.presenter';
-import { GameService } from '../../../../../shared/game/domain/Game.service';
-import { Point } from '../../../../../shared/game/domain/entities/Point.entity';
-import { ClientGameService } from '../../domain/ClientGame.service';
-import { PointType } from '@shared/game/domain/entities/Matrix.entity';
 
 type PlaneMeshType = THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardMaterial>;
 

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GameMove } from '../../../../../../shared/game/domain/entities/GameMove.entity';
-import { PointType } from '../../../../../../shared/game/domain/entities/Matrix.entity';
+import { PointType } from '../../../../../../shared/game/domain/entities/Matrix/Matrix.entity';
 import { Point } from '../../../../../../shared/game/domain/entities/Point.entity';
 import { modulesController } from '../../../../modulesController';
 import { WorldPresenter } from '../../../../world/presenter/World.presenter';
@@ -34,8 +34,13 @@ export class FiguresPresenter {
                 this.worldPresenter.scene.add(figure.object);
 
                 this.figures.push(figure);
+                if (matrix.isQueen(new Point(j, i))) {
+                    figure.makeQueen();
+                }
             }
         }
+
+        // this.figures[0].makeQueen();
     }
 
     listenToEvents() {
@@ -62,16 +67,36 @@ export class FiguresPresenter {
         const figure = this.figures.find(figure => figure.gamePosition.equals(fromPosition));
         if (!figure) return;
 
+        const onMoveResult = () => {
+            this.removeCapturedPoints(gameMove);
+            if (this.gameService.matrix.isQueen(figure.gamePosition)) {
+                figure.makeQueen();
+            }
+        };
+
         if (gameMove.capturedPoints.length > 0) {
-            figure.animateToCapturing(gameMove.path[gameMove.path.length - 1], () => {
-                figure.moveTo(gameMove.path[gameMove.path.length - 1]);
-            });
+            let curIndex = -1;
+            const recursiveMove = () => {
+                curIndex++;
+                if (curIndex < gameMove.path.length) {
+                    figure.animateToCapturing(gameMove.path[curIndex], () => {
+                        figure.moveTo(gameMove.path[curIndex]);
+                        recursiveMove();
+                    });
+                } else {
+                    onMoveResult();
+                }
+            };
+            recursiveMove();
         } else {
             figure.animateToLinear(gameMove.path[gameMove.path.length - 1], () => {
                 figure.moveTo(gameMove.path[gameMove.path.length - 1]);
+                onMoveResult();
             });
         }
+    }
 
+    removeCapturedPoints(gameMove: GameMove) {
         gameMove.capturedPoints.forEach(capturedPoint => {
             const figure = this.figures.find(figure => figure.gamePosition.equals(capturedPoint));
             if (figure) {

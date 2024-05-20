@@ -1,4 +1,4 @@
-import { PointType } from '../entities/Matrix.entity';
+import { PointType } from './Matrix.entity';
 
 export const pointTypesOpposite = (pointType1: PointType, pointType2: PointType) => {
     return (

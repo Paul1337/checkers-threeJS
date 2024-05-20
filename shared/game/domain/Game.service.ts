@@ -1,15 +1,18 @@
 import { GameMove } from './entities/GameMove.entity';
-import { Matrix, PointType } from './entities/Matrix.entity';
+import { Matrix, PointType } from './entities/Matrix/Matrix.entity';
 import { Player } from './entities/Player.entity';
 import { Point } from './entities/Point.entity';
 import { gameConfig } from './Game.config';
-import { pointTypesOpposite } from './lib/pointType';
+import { pointTypesOpposite } from './entities/Matrix/pointType.utils';
+import { GameMoveService } from './GameMove.service';
 
 export class GameService {
     matrix: Matrix;
     protected player1: Player;
     protected player2: Player;
     protected currentPlayer: Player;
+
+    gameMoveService: GameMoveService;
 
     constructor() {
         this.matrix = new Matrix(gameConfig.matrix.width, gameConfig.matrix.height);
@@ -18,77 +21,18 @@ export class GameService {
         this.player2 = new Player(PointType.Black);
 
         this.currentPlayer = this.player1;
+
+        this.gameMoveService = new GameMoveService(this.matrix);
     }
 
     getAvailableDestinationsFrom(point: Point) {
-        return this.getMovesFrom(point)
-            .map(move => move.path)
-            .flat();
+        return this.getMovesFrom(point).map(move => move.path[move.path.length - 1]);
     }
 
     getMovesFrom(point: Point): GameMove[] {
-        const pointType = this.matrix.get(point);
-        const rowYMove = pointType === PointType.White ? point.y + 1 : point.y - 1;
-        const moveToPoints = [new Point(point.x - 1, rowYMove), new Point(point.x + 1, rowYMove)].filter(
-            point => this.matrix.includesPoint(point)
-        );
-
-        const movingMoves: GameMove[] = [];
-
-        moveToPoints.forEach(movePoint => {
-            if (this.matrix.get(movePoint) === PointType.Empty) {
-                movingMoves.push({
-                    capturedPoints: [],
-                    path: [movePoint],
-                });
-            }
-        });
-
-        return movingMoves.concat(this.getCaptureMoves(point, this.matrix.get(point)));
-    }
-
-    getCaptureMoves(from: Point, pointType: PointType, tail: Point[] = []): GameMove[] {
-        const capturesStep = (
-            [
-                this.getCapturePoint(from, -1, 1, pointType),
-                this.getCapturePoint(from, 1, 1, pointType),
-                this.getCapturePoint(from, -1, -1, pointType),
-                this.getCapturePoint(from, 1, -1, pointType),
-            ].filter(Boolean) as GameMove[]
-        ).filter(move => !tail.some(tailPoint => tailPoint.equals(move?.path[move.path.length - 1])));
-
-        return capturesStep
-            .map(move => {
-                const nextPoint = move.path[move.path.length - 1];
-                const innerMoves = this.getCaptureMoves(nextPoint, pointType, tail.concat(nextPoint));
-                const withInnerMoves: GameMove[] = innerMoves.map(inner => ({
-                    capturedPoints: move.capturedPoints.concat(inner.capturedPoints),
-                    path: move.path.concat(inner.path),
-                }));
-
-                const withoutInnerMoves: GameMove = {
-                    capturedPoints: move.capturedPoints,
-                    path: move.path,
-                };
-
-                return withInnerMoves.concat(withoutInnerMoves);
-            })
-            .flat();
-    }
-
-    getCapturePoint(from: Point, dx: number, dy: number, pointType: PointType): GameMove | undefined {
-        const capturingPoint = new Point(from.x + dx, from.y + dy);
-        const nextPathPoint = new Point(from.x + dx * 2, from.y + dy * 2);
-        if (
-            this.matrix.includesPoint(nextPathPoint) &&
-            this.matrix.get(nextPathPoint) === PointType.Empty &&
-            pointTypesOpposite(this.matrix.get(capturingPoint), pointType)
-        ) {
-            return {
-                capturedPoints: [capturingPoint],
-                path: [nextPathPoint],
-            };
-        }
+        const movingMoves = this.gameMoveService.getMovingMoves(point);
+        const captureMoves = this.gameMoveService.getCaptureMoves(point, point);
+        return movingMoves.concat(captureMoves);
     }
 
     resetGame() {
@@ -96,7 +40,8 @@ export class GameService {
     }
 
     makeMove(from: Point, gameMove: GameMove) {
-        this.moveChecker(from, gameMove.path[gameMove.path.length - 1]);
+        this.matrix.move(from, gameMove.path[gameMove.path.length - 1]);
+
         gameMove.capturedPoints.forEach(point => {
             this.matrix.remove(point);
         });
@@ -106,10 +51,5 @@ export class GameService {
 
     switchTurn() {
         this.currentPlayer = this.currentPlayer === this.player1 ? this.player2 : this.player1;
-    }
-
-    moveChecker(from: Point, to: Point) {
-        this.matrix.set(to, this.matrix.get(from));
-        this.matrix.set(from, PointType.Empty);
     }
 }

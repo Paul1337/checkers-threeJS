@@ -1,13 +1,11 @@
 import * as THREE from 'three';
 import { presenterConfig } from '../../Presenter.config';
-// import { PointType } from '../../../domain/entities/Matrix.entity';
-// import { Point } from '../../../domain/entities/Point.entity';
-import { Animation } from '../Animation/Animation.presenter';
-import { PointType } from '../../../../../../shared/game/domain/entities/Matrix.entity';
+import { PointType } from '../../../../../../shared/game/domain/entities/Matrix/Matrix.entity';
 import { Point } from '../../../../../../shared/game/domain/entities/Point.entity';
+import { Animation } from '../Animation/Animation.presenter';
+import { CapturingAnimation } from '../Animation/CapturingAnimation.presenter';
 import { LinearAnimation } from '../Animation/LinearAnimation.presenter';
 import { FigureConverter } from './Figure.converter';
-import { CapturingAnimation } from '../Animation/CapturingAnimation.presenter';
 
 export interface FigureConfig {
     radius: number;
@@ -52,6 +50,21 @@ export class Figure {
 
         this.object = figure;
         this.isSelected = false;
+    }
+
+    makeQueen() {
+        const config = presenterConfig.figure;
+        const markHeight = config.height * 0.1;
+        const queenMark = new THREE.Mesh(
+            new THREE.CylinderGeometry(config.radius, config.radius, markHeight, 32),
+            new THREE.MeshStandardMaterial({
+                metalness: 0.4,
+                roughness: 0.2,
+                color: 0xff0000,
+            })
+        );
+        queenMark.position.set(0, config.height / 2 + markHeight / 2, 0);
+        this.object.add(queenMark);
     }
 
     select() {
@@ -114,10 +127,6 @@ export class Figure {
             onDone
         );
     }
-
-    // animate(animation: Animation) {
-    //     this.movingAnimation = animation;
-    // }
 
     moveTo(position: Point) {
         this.gamePosition = position;

@@ -1,6 +1,6 @@
 import { GameService } from '@shared/game/domain/Game.service';
 import { network } from '../../shared/api/network.api';
-import { PointType } from '@shared/game/domain/entities/Matrix.entity';
+import { PointType } from '@shared/game/domain/entities/Matrix/Matrix.entity';
 import { Player } from '@shared/game/domain/entities/Player.entity';
 import { Point } from '@shared/game/domain/entities/Point.entity';
 import { GameMove } from '@shared/game/domain/entities/GameMove.entity';

@@ -2,7 +2,7 @@ import { GameService } from '@shared/game/domain/Game.service';
 import './styles.css';
 import { network } from '../../../../shared/api/network.api';
 import { MoveDto } from '@shared/game/dto/MoveDto';
-import { PointType } from '@shared/game/domain/entities/Matrix.entity';
+import { PointType } from '@shared/game/domain/entities/Matrix/Matrix.entity';
 import { ClientGameService } from '../../../domain/ClientGame.service';
 
 export class UI {
