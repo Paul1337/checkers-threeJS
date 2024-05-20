@@ -14,6 +14,6 @@ export class EventEmitter {
         if (!this.events[event]) {
             this.events[event] = [];
         }
-        this.events[event].push(callback);
+        this.events[event]!.push(callback);
     }
 }
