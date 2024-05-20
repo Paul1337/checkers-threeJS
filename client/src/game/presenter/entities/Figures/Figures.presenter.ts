@@ -70,7 +70,9 @@ export class FiguresPresenter {
         const onMoveResult = () => {
             this.removeCapturedPoints(gameMove);
             if (this.gameService.matrix.isQueen(figure.gamePosition)) {
-                figure.makeQueen();
+                if (!figure.isQueen) {
+                    figure.makeQueen();
+                }
             }
         };
 

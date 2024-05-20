@@ -13,5 +13,6 @@ export const presenterConfig = {
         liftFigureTime: 15,
         linearMoveTime: 25,
         captureMoveTime: 50,
+        queenBecoming: 100,
     },
 };

@@ -26,6 +26,8 @@ export class Figure {
 
     private movingAnimation?: Animation;
 
+    public isQueen = false;
+
     constructor(type: PointType, public gamePosition: Point) {
         const config = presenterConfig.figure;
         const geometry = new THREE.CylinderGeometry(config.radius, config.radius, config.height, 32);
@@ -53,6 +55,7 @@ export class Figure {
     }
 
     makeQueen() {
+        this.isQueen = true;
         const config = presenterConfig.figure;
         const markHeight = config.height * 0.1;
         const queenMark = new THREE.Mesh(
@@ -63,8 +66,26 @@ export class Figure {
                 color: 0xff0000,
             })
         );
-        queenMark.position.set(0, config.height / 2 + markHeight / 2, 0);
+        queenMark.position.set(0, -(config.height / 2 + markHeight / 2), 0);
         this.object.add(queenMark);
+
+        const liftedPosition = this.liftedPosition.clone().setY(this.liftedPosition.y + 1.2);
+        this.movingAnimation = new LinearAnimation({
+            positionFrom: this.object.position.clone(),
+            positionTo: liftedPosition,
+            alphaFrom: this.object.rotation,
+            alphaTo: new THREE.Euler(Math.PI / 2, 0, 0),
+            time: Math.floor(presenterConfig.animation.queenBecoming / 2),
+            onDone: () => {
+                this.movingAnimation = new LinearAnimation({
+                    positionFrom: this.object.position.clone(),
+                    positionTo: this.defaultPosition,
+                    alphaFrom: this.object.rotation,
+                    alphaTo: new THREE.Euler(Math.PI, 0, 0),
+                    time: Math.floor(presenterConfig.animation.queenBecoming / 2),
+                });
+            },
+        });
     }
 
     select() {
@@ -74,11 +95,11 @@ export class Figure {
     }
 
     lift() {
-        this.movingAnimation = new LinearAnimation(
-            this.object.position.clone(),
-            this.liftedPosition.clone(),
-            presenterConfig.animation.liftFigureTime
-        );
+        this.movingAnimation = new LinearAnimation({
+            positionFrom: this.object.position.clone(),
+            positionTo: this.liftedPosition.clone(),
+            time: presenterConfig.animation.liftFigureTime,
+        });
     }
 
     unselect() {
@@ -87,11 +108,11 @@ export class Figure {
     }
 
     unlift() {
-        this.movingAnimation = new LinearAnimation(
-            this.object.position.clone(),
-            this.defaultPosition.clone(),
-            presenterConfig.animation.liftFigureTime
-        );
+        this.movingAnimation = new LinearAnimation({
+            positionFrom: this.object.position.clone(),
+            positionTo: this.defaultPosition.clone(),
+            time: presenterConfig.animation.liftFigureTime,
+        });
     }
 
     hover() {
@@ -110,22 +131,22 @@ export class Figure {
 
     animateToLinear(position: Point, onDone: () => void) {
         const resultPosition = FigureConverter.convertToPresenterPosition(position);
-        this.movingAnimation = new LinearAnimation(
-            this.object.position.clone(),
-            resultPosition,
-            presenterConfig.animation.linearMoveTime,
-            onDone
-        );
+        this.movingAnimation = new LinearAnimation({
+            positionFrom: this.object.position.clone(),
+            positionTo: resultPosition,
+            time: presenterConfig.animation.linearMoveTime,
+            onDone,
+        });
     }
 
     animateToCapturing(position: Point, onDone: () => void) {
         const resultPosition = FigureConverter.convertToPresenterPosition(position);
-        this.movingAnimation = new CapturingAnimation(
-            this.object.position.clone(),
-            resultPosition,
-            presenterConfig.animation.captureMoveTime,
-            onDone
-        );
+        this.movingAnimation = new CapturingAnimation({
+            positionFrom: this.object.position.clone(),
+            positionTo: resultPosition,
+            time: presenterConfig.animation.captureMoveTime,
+            onDone,
+        });
     }
 
     moveTo(position: Point) {
@@ -139,6 +160,7 @@ export class Figure {
         if (this.movingAnimation) {
             this.movingAnimation.update();
             this.object.position.copy(this.movingAnimation.currentPoint);
+            this.object.rotation.copy(this.movingAnimation.currentAlpha);
             if (this.movingAnimation.isFinished) {
                 this.movingAnimation = undefined;
             }
