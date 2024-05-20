@@ -1,9 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { GameService } from '@shared/game/domain/Game.service';
-import { Socket } from 'net';
-import { generateId } from './lib/generateId';
-import { MoveDto } from '@shared/game/dto/MoveDto';
 import { GameResult } from '@shared/game/dto/GameEnd.dto';
+import { MoveDto } from '@shared/game/dto/MoveDto';
 
 @Injectable()
 export class GameGlobalService {

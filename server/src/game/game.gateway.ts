@@ -7,15 +7,14 @@ import {
     WebSocketGateway,
     WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
 import { PointType } from '@shared/game/domain/entities/Matrix/Matrix.entity';
-import { MoveDto } from '@shared/game/dto/MoveDto';
-import { JoinResultDto } from '@shared/game/dto/JoinResult.dto';
 import { GameEndDto, GameResult } from '@shared/game/dto/GameEnd.dto';
+import { JoinResultDto } from '@shared/game/dto/JoinResult.dto';
+import { MoveDto } from '@shared/game/dto/MoveDto';
+import { Server, Socket } from 'socket.io';
 
-import { GameGlobalService } from './game-global.service';
-import { generateId } from './lib/generateId';
 import { GameStartDto } from '@shared/game/dto/GameStart.dto';
+import { GameGlobalService } from './game-global.service';
 
 const getRoomByGameId = (gameId: string) => `game:${gameId}`;
 
