@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import { GameMove } from '../../../../../../shared/game/domain/entities/GameMove.entity';
 import { PointType } from '../../../../../../shared/game/domain/entities/Matrix/Matrix.entity';
 import { Point } from '../../../../../../shared/game/domain/entities/Point.entity';
-import { modulesController } from '../../../../modulesController';
-import { WorldPresenter } from '../../../../world/presenter/World.presenter';
+import { modulesController } from '../../../gameModulesController';
+import { WorldPresenter } from '../../../world/presenter/World.presenter';
 import { ClientGameService } from '../../../domain/ClientGame.service';
 import { GameBoard } from '../GameBoard.presenter';
 import { Figure, FigureObjectType } from './Figure.presenter';
@@ -44,7 +44,8 @@ export class FiguresPresenter {
     }
 
     listenToEvents() {
-        this.gameService.matrix.events.onReset = () => this.resetFigures();
+        // this.gameService.matrix.events.onReset = () => this.resetFigures();
+        this.gameService.eventEmmiter.on('game-start', this.resetFigures.bind(this));
 
         document.addEventListener('mousemove', this.handleMouseMove.bind(this));
         document.addEventListener('mousedown', this.handleMouseDown.bind(this));

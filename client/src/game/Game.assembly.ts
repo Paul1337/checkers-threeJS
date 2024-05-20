@@ -1,11 +1,9 @@
-import { GameService } from '../../../shared/game/domain/Game.service';
-import { modulesController } from '../modulesController';
-import { WorldPresenter } from '../world/presenter/World.presenter';
+import { ClientGameService } from './domain/ClientGame.service';
+import { modulesController } from './gameModulesController';
+import { EventsPresenter } from './presenter/entities/Events.presenter';
 import { FiguresPresenter } from './presenter/entities/Figures/Figures.presenter';
 import { GameBoard } from './presenter/entities/GameBoard.presenter';
-import { EventsPresenter } from './presenter/entities/Events.presenter';
-import { UI } from './presenter/entities/UI/UI.presenter';
-import { ClientGameService } from './domain/ClientGame.service';
+import { WorldPresenter } from './world/presenter/World.presenter';
 
 export class Game {
     readonly gameService: ClientGameService;
@@ -13,7 +11,6 @@ export class Game {
 
     readonly figuresPresenter: FiguresPresenter;
     readonly eventsPresenter: EventsPresenter;
-    readonly uiPresenter: UI;
 
     readonly board: GameBoard;
 
@@ -29,16 +26,26 @@ export class Game {
         this.board = new GameBoard(this.gameService);
         this.figuresPresenter = new FiguresPresenter(this.gameService, this.board);
         this.eventsPresenter = new EventsPresenter(this.gameService, this.figuresPresenter);
-        this.uiPresenter = new UI(this.gameService);
-
-        // const dragControl = new DragControl(figuresPresenter.figures.map(figure => figure.object));
 
         this.update();
     }
 
+    private lastAnimationFrame: number | null = null;
+    private shouldUpdate = true;
+
     update() {
+        if (!this.shouldUpdate) return;
+
+        // console.log(this.figuresPresenter.figures);
+        // console.log('update');
+
         this.worldPresenter.update();
         this.figuresPresenter.update();
-        requestAnimationFrame(this.update.bind(this));
+        this.lastAnimationFrame = requestAnimationFrame(this.update.bind(this));
+    }
+
+    stop() {
+        if (this.lastAnimationFrame) cancelAnimationFrame(this.lastAnimationFrame);
+        this.shouldUpdate = false;
     }
 }

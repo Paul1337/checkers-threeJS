@@ -1,7 +1,7 @@
-export abstract class EventEmmiter {
+export class EventEmitter {
     private events: Record<string, undefined | ((data?: any) => void)[]> = {};
 
-    emit(event: string, data: any) {
+    emit(event: string, data?: any) {
         const eventCallbacks = this.events[event];
         if (eventCallbacks) {
             eventCallbacks.forEach(callback => {

@@ -5,6 +5,7 @@ import { Point } from './entities/Point.entity';
 import { gameConfig } from './Game.config';
 import { pointTypesOpposite } from './entities/Matrix/pointType.utils';
 import { GameMoveService } from './GameMove.service';
+import { GameResult } from '../dto/GameEnd.dto';
 
 export class GameService {
     matrix: Matrix;
@@ -23,6 +24,16 @@ export class GameService {
         this.currentPlayer = this.player1;
 
         this.gameMoveService = new GameMoveService(this.matrix);
+    }
+
+    get gameResult(): GameResult | null {
+        if (this.matrix.all.every(point => point !== PointType.Black)) {
+            return GameResult.Player1Winner;
+        }
+        if (this.matrix.all.every(point => point !== PointType.White)) {
+            return GameResult.Player2Winner;
+        }
+        return null;
     }
 
     getAvailableDestinationsFrom(point: Point) {

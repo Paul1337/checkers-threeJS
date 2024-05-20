@@ -5,11 +5,19 @@ import {
     OnGatewayDisconnect,
     SubscribeMessage,
     WebSocketGateway,
+    WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket } from 'net';
+import { Socket, Server } from 'socket.io';
 import { PointType } from '@shared/game/domain/entities/Matrix/Matrix.entity';
 import { MoveDto } from '@shared/game/dto/MoveDto';
-import { GameService } from '@shared/game/domain/Game.service';
+import { JoinResultDto } from '@shared/game/dto/JoinResult.dto';
+import { GameEndDto, GameResult } from '@shared/game/dto/GameEnd.dto';
+
+import { GameGlobalService } from './game-global.service';
+import { generateId } from './lib/generateId';
+import { GameStartDto } from '@shared/game/dto/GameStart.dto';
+
+const getRoomByGameId = (gameId: string) => `game:${gameId}`;
 
 @WebSocketGateway({
     cors: {
@@ -17,48 +25,75 @@ import { GameService } from '@shared/game/domain/Game.service';
     },
 })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
-    connected: Socket[];
+    @WebSocketServer()
+    private server: Server;
 
-    constructor(private gameService: GameService) {
-        this.connected = [];
-    }
+    constructor(private gameGlobalService: GameGlobalService) {}
 
     handleConnection(client: Socket) {
-        if (this.connected.length < 2) {
-            this.connected.push(client);
-        } else {
-            // this.connected = [client];
-        }
-        console.log('connected list', this.connected.length);
+        console.log('new connection');
     }
 
     handleDisconnect(client: Socket) {
-        const disconnectedIndex = this.connected.indexOf(client);
-        if (disconnectedIndex > -1) {
-            this.connected.splice(disconnectedIndex, 1);
-        }
-        console.log('connected list', this.connected.length);
+        console.log('disconnection');
     }
 
     @SubscribeMessage('reset')
-    resetGame() {
-        this.gameService.resetGame();
-    }
-
-    @SubscribeMessage('init')
-    initPlayer(@ConnectedSocket() client: Socket) {
-        const playerIndex = this.connected.indexOf(client);
-        return playerIndex === 0 ? PointType.White : PointType.Black;
-    }
+    resetGame() {}
 
     @SubscribeMessage('move')
-    handleMove(@MessageBody() data: MoveDto, @ConnectedSocket() client: Socket) {
-        if (this.connected.length < 2) {
-            console.warn('Not enough players for the game');
-            return;
+    handleMove(@MessageBody() moveDto: MoveDto, @ConnectedSocket() client: Socket) {
+        const result = this.gameGlobalService.move(moveDto);
+        const roomId = getRoomByGameId(moveDto.gameId);
+        client.to(roomId).emit('move', moveDto);
+        if (result) {
+            const gameEndDto: GameEndDto = { result };
+            this.server.to(roomId).emit('game-end', gameEndDto);
+            this.server.socketsLeave(roomId);
+            this.gameGlobalService.deleteGame(moveDto.gameId);
         }
-        const playerIndex = this.connected.indexOf(client);
-        const oppositePlayerIndex = 1 - playerIndex;
-        this.connected[oppositePlayerIndex].emit('move', data);
+    }
+
+    @SubscribeMessage('new-game')
+    handleNewGame(@ConnectedSocket() client: Socket) {
+        const gameId = this.gameGlobalService.createGame();
+        client.join(getRoomByGameId(gameId));
+        return gameId;
+    }
+
+    @SubscribeMessage('join-game')
+    async handleJoinGame(
+        @MessageBody() gameId: string,
+        @ConnectedSocket() client: Socket,
+    ): Promise<JoinResultDto> {
+        const roomId = getRoomByGameId(gameId);
+        client.join(roomId);
+        const sockets = await this.server.in(roomId).fetchSockets();
+        if (sockets.length === 2) {
+            const rnd = Math.random();
+            const gameStartDto: GameStartDto = {
+                pointType: rnd > 0.5 ? PointType.White : PointType.Black,
+                gameId,
+            };
+            client.to(roomId).emit('game-start', gameStartDto);
+            return {
+                success: true,
+                gameStartDto: { pointType: rnd > 0.5 ? PointType.Black : PointType.White, gameId },
+            };
+        }
+        return {
+            success: false,
+        };
+    }
+
+    @SubscribeMessage('finish-game')
+    handleFinishGame(@MessageBody() gameId: string, @ConnectedSocket() client: Socket) {
+        this.gameGlobalService.deleteGame(gameId);
+        const gameEndDto: GameEndDto = {
+            result: GameResult.PlayerEndedGame,
+        };
+        const roomId = getRoomByGameId(gameId);
+        this.server.to(roomId).emit('game-end', gameEndDto);
+        this.server.socketsLeave(roomId);
     }
 }

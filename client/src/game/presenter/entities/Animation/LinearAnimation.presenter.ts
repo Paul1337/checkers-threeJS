@@ -15,7 +15,8 @@ export class LinearAnimation extends Animation {
     }
 
     override getCurrentAlpha(): THREE.Euler {
-        if (!this.animationConfig.alphaFrom) return new THREE.Euler(0, 0, 0);
+        if (!this.animationConfig.alphaFrom || !this.animationConfig.alphaTo)
+            return new THREE.Euler(0, 0, 0);
         return new THREE.Euler(
             this.animationConfig.alphaFrom.x +
                 (this.animationConfig.alphaTo.x - this.animationConfig.alphaFrom.x) * this.part,

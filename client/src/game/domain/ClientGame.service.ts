@@ -4,46 +4,59 @@ import { PointType } from '@shared/game/domain/entities/Matrix/Matrix.entity';
 import { Player } from '@shared/game/domain/entities/Player.entity';
 import { Point } from '@shared/game/domain/entities/Point.entity';
 import { GameMove } from '@shared/game/domain/entities/GameMove.entity';
-
-export interface ClientGameServiceEvents {
-    onTurnUpdate?: (myTurn: boolean) => void;
-    onGameStart: (() => void)[];
-}
+import { GameStartDto } from '@shared/game/dto/GameStart.dto';
+import { EventEmitter } from '@shared/game/domain/utils/EventEmmiter';
+import { GameEndDto } from '@shared/game/dto/GameEnd.dto';
+import { computed, makeAutoObservable, observable } from 'mobx';
+import { MoveDto } from '@shared/game/dto/MoveDto';
 
 export class ClientGameService extends GameService {
-    public events: ClientGameServiceEvents = {
-        onGameStart: [],
-    };
+    readonly eventEmmiter: EventEmitter;
+
     me: Player;
+    private gameId: string = '';
 
     constructor() {
         super();
 
+        // makeAutoObservable(this);
+
+        this.eventEmmiter = new EventEmitter();
         this.me = this.player1;
-        this.start();
+
+        this.handleNetworkEvents();
     }
 
-    start() {
-        network.emit('init', (playerPointType: PointType) => {
-            console.log('Inited as player', playerPointType);
-            this.currentPlayer = this.player1;
-            this.me = playerPointType === PointType.White ? this.player1 : this.player2;
-            this.matrix.reset();
-            this.events.onGameStart.forEach(ev => ev());
-        });
+    handleNetworkEvents() {
+        // network.on('game-start', this.handleGameStart.bind(this));
+        network.on('game-end', this.handleGameEnd.bind(this));
     }
+
+    start(gameStartDto: GameStartDto) {
+        console.log('Game start as player', gameStartDto.pointType);
+        this.currentPlayer = this.player1;
+        this.me = gameStartDto.pointType === PointType.White ? this.player1 : this.player2;
+        this.matrix.reset();
+        console.log('emit game-start');
+        this.eventEmmiter.emit('game-start');
+        this.gameId = gameStartDto.gameId;
+    }
+
+    handleGameEnd(gameEndDto: GameEndDto) {}
 
     switchTurn() {
         super.switchTurn();
-        this.events.onTurnUpdate?.(this.myTurn);
+        this.eventEmmiter.emit('turn-switch', this.myTurn);
     }
 
     makeMyMove(from: Point, gameMove: GameMove) {
         this.makeMove(from, gameMove);
-        network.emit('move', {
+        const moveDto: MoveDto = {
             from,
             move: gameMove,
-        });
+            gameId: this.gameId,
+        };
+        network.emit('move', moveDto);
     }
 
     get myTurn() {

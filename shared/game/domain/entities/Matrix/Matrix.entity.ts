@@ -8,15 +8,9 @@ export enum PointType {
 
 export type FieldType = Array<Array<PointType>>;
 
-export interface MatrixEvents {
-    onReset?: () => void;
-}
-
 export class Matrix {
     private field: FieldType;
     private queens: Point[];
-
-    public events: MatrixEvents = {};
 
     constructor(width: number, height: number) {
         this.field = [];
@@ -27,6 +21,10 @@ export class Matrix {
                 this.field[i][j] = PointType.Empty;
             }
         }
+    }
+
+    get all() {
+        return this.field.flat();
     }
 
     reset() {
@@ -42,7 +40,7 @@ export class Matrix {
         this.queens = [];
         // this.queens.push(new Point(1, 2));
 
-        this.events.onReset?.();
+        // this.events.onReset?.();
     }
 
     includesPoint(point: Point) {

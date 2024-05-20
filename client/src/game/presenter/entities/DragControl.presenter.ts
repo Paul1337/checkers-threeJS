@@ -1,7 +1,7 @@
 import { DragControls } from 'three/examples/jsm/Addons.js';
 import * as THREE from 'three';
-import { modulesController } from '../../../modulesController';
-import { WorldPresenter } from '../../../world/presenter/World.presenter';
+import { modulesController } from '../../gameModulesController';
+import { WorldPresenter } from '../../world/presenter/World.presenter';
 
 export class DragControl {
     private dragControls: DragControls;

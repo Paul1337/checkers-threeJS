@@ -159,8 +159,9 @@ export class Figure {
     updateAnimations() {
         if (this.movingAnimation) {
             this.movingAnimation.update();
-            this.object.position.copy(this.movingAnimation.currentPoint);
-            this.object.rotation.copy(this.movingAnimation.currentAlpha);
+            this.movingAnimation.applyTo(this.object);
+            // this.object.position.copy(this.movingAnimation.currentPoint);
+            // this.object.rotation.copy(this.movingAnimation.currentAlpha);
             if (this.movingAnimation.isFinished) {
                 this.movingAnimation = undefined;
             }

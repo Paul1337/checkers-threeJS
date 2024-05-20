@@ -1,8 +1,8 @@
 import { PointType } from '@shared/game/domain/entities/Matrix/Matrix.entity';
 import * as THREE from 'three';
 import { Point } from '@shared/game/domain/entities/Point.entity';
-import { modulesController } from '../../../modulesController';
-import { WorldPresenter } from '../../../world/presenter/World.presenter';
+import { modulesController } from '../../gameModulesController';
+import { WorldPresenter } from '../../world/presenter/World.presenter';
 import { ClientGameService } from '../../domain/ClientGame.service';
 import woodAsset from '../assets/wood2.jpg';
 import { presenterConfig } from '../Presenter.config';
@@ -75,15 +75,16 @@ export class GameBoard {
     }
 
     listenToEvents() {
-        this.gameService.events.onGameStart.push(() => {
-            if (this.gameService.me.pointType === PointType.White) {
-                this.worldPresenter.camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
-                this.worldPresenter.orbitControls.update();
-            }
-        });
-
+        this.gameService.eventEmmiter.on('game-start', this.handleGameStart.bind(this));
         document.addEventListener('mousemove', this.handleMouseMove.bind(this));
         document.addEventListener('click', this.handleMouseDown.bind(this));
+    }
+
+    handleGameStart() {
+        if (this.gameService.me.pointType === PointType.White) {
+            this.worldPresenter.camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+            this.worldPresenter.orbitControls.update();
+        }
     }
 
     private hoveredCell: PlaneMeshType | null = null;
