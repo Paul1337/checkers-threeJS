@@ -19,9 +19,12 @@ export abstract class Animation {
     public currentAlpha?: THREE.Euler;
     private isRunning = true;
 
+    private lastTime: number;
+
     constructor(protected animationConfig: AnimationConfig) {
         this.currentPoint = this.animationConfig.positionFrom?.clone() ?? new THREE.Vector3(0, 0, 0);
-        this.currentAlpha = this.animationConfig.alphaFrom;
+        this.currentAlpha = this.animationConfig.alphaFrom?.clone();
+        this.lastTime = performance.now();
     }
 
     get isFinished() {
@@ -37,7 +40,10 @@ export abstract class Animation {
     }
 
     update() {
-        this.currentTime++;
+        const now = performance.now();
+        const delta = now - this.lastTime;
+        this.lastTime = now;
+        this.currentTime += delta;
         this.part = this.currentTime / this.animationConfig.time;
 
         if (this.part > 1) this.part = 1;

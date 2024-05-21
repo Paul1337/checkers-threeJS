@@ -1,7 +1,8 @@
+import { EventEmitter } from '@shared/game/domain/utils/EventEmmiter';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 
-export class WorldPresenter {
+export class WorldPresenter extends EventEmitter {
     container: HTMLDivElement;
     camera: THREE.PerspectiveCamera;
     scene: THREE.Scene;
@@ -9,7 +10,12 @@ export class WorldPresenter {
 
     orbitControls: OrbitControls;
 
+    private lastAnimationFrame: number | null = null;
+    private shouldUpdate = true;
+
     constructor() {
+        super();
+
         this.container = document.getElementById('game-container') as HTMLDivElement;
 
         this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 500);
@@ -48,10 +54,20 @@ export class WorldPresenter {
         this.container.appendChild(this.renderer.domElement);
 
         this.handleEvents();
+        this.update();
     }
 
     update() {
+        if (!this.shouldUpdate) return;
+
         this.renderer.render(this.scene, this.camera);
+        this.emit('update');
+        this.lastAnimationFrame = requestAnimationFrame(this.update.bind(this));
+    }
+
+    stopUpdating() {
+        if (this.lastAnimationFrame) cancelAnimationFrame(this.lastAnimationFrame);
+        this.shouldUpdate = false;
     }
 
     handleEvents() {

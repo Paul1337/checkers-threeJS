@@ -19,7 +19,7 @@ export class FiguresPresenter {
 
         this.worldPresenter = modulesController.modules.world.worldPresenter;
 
-        this.listenToEvents();
+        this.handleEvents();
     }
 
     resetFigures() {
@@ -43,12 +43,13 @@ export class FiguresPresenter {
         // this.figures[0].makeQueen();
     }
 
-    listenToEvents() {
-        // this.gameService.matrix.events.onReset = () => this.resetFigures();
+    handleEvents() {
         this.gameService.eventEmmiter.on('game-start', this.resetFigures.bind(this));
 
         document.addEventListener('mousemove', this.handleMouseMove.bind(this));
         document.addEventListener('mousedown', this.handleMouseDown.bind(this));
+
+        this.worldPresenter.on('update', this.update.bind(this));
 
         this.board.onCellClick = point => {
             if (!this.selectedFigure) return;

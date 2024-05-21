@@ -73,14 +73,14 @@ export class Figure {
         this.movingAnimation = new LinearAnimation({
             positionFrom: this.object.position.clone(),
             positionTo: liftedPosition,
-            alphaFrom: this.object.rotation,
-            alphaTo: new THREE.Euler(Math.PI / 2, 0, 0),
+            alphaFrom: this.object.rotation.clone(),
+            alphaTo: new THREE.Euler((1 * Math.PI) / 2, 0, 0),
             time: Math.floor(presenterConfig.animation.queenBecoming / 2),
             onDone: () => {
                 this.movingAnimation = new LinearAnimation({
                     positionFrom: this.object.position.clone(),
                     positionTo: this.defaultPosition,
-                    alphaFrom: this.object.rotation,
+                    alphaFrom: this.object.rotation.clone(),
                     alphaTo: new THREE.Euler(Math.PI, 0, 0),
                     time: Math.floor(presenterConfig.animation.queenBecoming / 2),
                 });
