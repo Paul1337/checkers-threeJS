@@ -61,6 +61,7 @@ export class GameService {
     }
 
     switchTurn() {
+        console.log('switch turn super');
         this.currentPlayer = this.currentPlayer === this.player1 ? this.player2 : this.player1;
     }
 }

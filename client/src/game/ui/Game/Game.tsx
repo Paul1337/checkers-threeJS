@@ -47,9 +47,7 @@ export const Game = () => {
     return (
         <div id='game-container'>
             {!inGame && <Menu onJoinClick={handleJoinClick} />}
-            {inGame && gameModulesReady && (
-                <GameInfo gameService={modulesController.modules.game!.gameService} />
-            )}
+            {inGame && gameModulesReady && <GameInfo />}
             {gameEndModal.isShown && <GameEndModal status={gameEndStatus} onClose={gameEndModal.hide} />}
         </div>
     );
