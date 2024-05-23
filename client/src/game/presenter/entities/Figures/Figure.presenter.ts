@@ -59,7 +59,7 @@ export class Figure {
         const config = presenterConfig.figure;
         const markHeight = config.height * 0.1;
         const queenMark = new THREE.Mesh(
-            new THREE.CylinderGeometry(config.radius, config.radius, markHeight, 32),
+            new THREE.CylinderGeometry(config.radius * 0.5, config.radius * 0.5, markHeight, 32),
             new THREE.MeshStandardMaterial({
                 metalness: 0.4,
                 roughness: 0.2,
